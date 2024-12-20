@@ -1,5 +1,4 @@
 const { fetchGraphQL } = require("../models/graphqlModel");
-const { getCurrentTermId } = require("./termController");
 
 const getRegions = async (req, res) => {
   const query =
@@ -22,7 +21,7 @@ const getRegions = async (req, res) => {
 
 const getRegionDetails = async (req, res) => {
   const id = parseInt(req.params.id);
-  const currentTermId = await getCurrentTermId();
+  const currentTermId = req.query.term;
 
   if (!currentTermId) {
     res.status(500).send("No current term");
@@ -76,7 +75,6 @@ const getRegionDetails = async (req, res) => {
         imageURL: data.data.committeeTerm.member_position.person.profile_photo,
       });
     }
-
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.send(mcvps);
   } else {
