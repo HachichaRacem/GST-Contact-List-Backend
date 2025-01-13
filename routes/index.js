@@ -1,10 +1,16 @@
-const express = require("express");
-const regionsRoutes = require("./regionsRoutes");
-const termsRoutes = require("./termsRoutes");
+import { Router } from "express";
+import regionsRoutes from "./regionsRoutes.js";
+import termsRoutes from "./termsRoutes.js";
+import authRoutes from "./authRoutes.js";
+import userRoutes from "./userRoutes.js";
 
-const router = express.Router();
+const apiRouter = Router();
+const authRouter = Router();
 
-router.use("/regions", regionsRoutes);
-router.use("/terms", termsRoutes);
+apiRouter.use("/regions", regionsRoutes);
+apiRouter.use("/terms", termsRoutes);
+apiRouter.use("/user", userRoutes);
 
-module.exports = router;
+authRouter.use("/", authRoutes);
+
+export default { apiRouter, authRouter };

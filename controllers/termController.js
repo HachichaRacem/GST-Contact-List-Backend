@@ -1,6 +1,6 @@
-const { fetchGraphQL } = require("../models/graphqlModel");
+import { fetchGraphQL } from "../models/graphqlModel.js";
 
-const getTerms = async (req, res) => {
+export const getTerms = async (req, res) => {
   const query = `{constants(type_id:"term"){id name}}`;
 
   try {
@@ -22,7 +22,7 @@ const getTerms = async (req, res) => {
   }
 };
 
-const getCurrentTerm = (terms) => {
+export const getCurrentTerm = (terms) => {
   const currentYear = new Date().getFullYear();
   const isNewTerm = new Date().getMonth() >= 1;
 
@@ -31,5 +31,3 @@ const getCurrentTerm = (terms) => {
   );
   return currentTerm ? currentTerm : terms[terms.length - 1];
 };
-
-module.exports = { getCurrentTerm, getTerms };

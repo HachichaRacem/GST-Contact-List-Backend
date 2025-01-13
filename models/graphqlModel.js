@@ -1,6 +1,8 @@
-require("dotenv").config();
+import dotenv from "dotenv";
 
-const fetchGraphQL = async (query) => {
+dotenv.config();
+
+export const fetchGraphQL = async (query) => {
   const url = process.env.GRAPHQL_URL;
   const accessToken = process.env.ACCESS_TOKEN;
 
@@ -13,5 +15,3 @@ const fetchGraphQL = async (query) => {
     body: JSON.stringify({ query }),
   });
 };
-
-module.exports = { fetchGraphQL };

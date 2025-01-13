@@ -1,12 +1,12 @@
-const express = require("express");
-const {
+import { Router } from "express";
+import {
   getRegions,
   getRegionDetails,
-} = require("../controllers/regionsController");
+} from "../controllers/regionsController.js";
 
-const router = express.Router();
+const router = Router();
 
 router.get("/", getRegions);
 router.get("/:id", getRegionDetails);
 
-module.exports = router;
+export default router;

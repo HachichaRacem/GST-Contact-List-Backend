@@ -1,8 +1,8 @@
-const express = require("express");
-const { getTerms } = require("../controllers/termController");
+import { Router } from "express";
+import { getTerms } from "../controllers/termController.js";
 
-const router = express.Router();
+const router = Router();
 
 router.get("/", getTerms);
 
-module.exports = router;
+export default router;

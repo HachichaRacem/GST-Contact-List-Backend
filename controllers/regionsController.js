@@ -1,6 +1,6 @@
-const { fetchGraphQL } = require("../models/graphqlModel");
+import { fetchGraphQL } from "../models/graphqlModel.js";
 
-const getRegions = async (req, res) => {
+export const getRegions = async (req, res) => {
   const query =
     'query {committees(filters:{tag:"Region"}){data{id full_name sub_office_count suboffices{id full_name}}}}';
 
@@ -24,7 +24,7 @@ const getRegions = async (req, res) => {
   }
 };
 
-const getRegionDetails = async (req, res) => {
+export const getRegionDetails = async (req, res) => {
   const id = parseInt(req.params.id);
   const currentTermId = req.query.term;
 
@@ -92,5 +92,3 @@ const getRegionDetails = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
-
-module.exports = { getRegions, getRegionDetails };
