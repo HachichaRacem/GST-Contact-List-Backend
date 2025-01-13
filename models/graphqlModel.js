@@ -2,9 +2,11 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export const fetchGraphQL = async (query) => {
+export const fetchGraphQL = async (
+  query,
+  accessToken = process.env.ACCESS_TOKEN
+) => {
   const url = process.env.GRAPHQL_URL;
-  const accessToken = process.env.ACCESS_TOKEN;
 
   return fetch(url, {
     method: "POST",

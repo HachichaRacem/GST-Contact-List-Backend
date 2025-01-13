@@ -7,8 +7,8 @@ export const getUserData = async (req, res) => {
     return;
   }
   try {
-    const query = `query {currentPerson{id full_name alternate_email aiesec_email contact_detail{phone country_code}}}`;
-    const response = await fetchGraphQL(query);
+    const query = `query {currentPerson{id full_name alternate_email aiesec_email profile_photo contact_detail{phone country_code}}}`;
+    const response = await fetchGraphQL(query, accessToken);
     if (response.ok) {
       const data = await response.json();
       res.setHeader("Access-Control-Allow-Origin", "*");
@@ -21,78 +21,44 @@ export const getUserData = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
-export const updateUserAlternateEmail = async (req, res) => {
-  const accessToken = req.body.accessToken;
-  const id = req.params.id;
-  const alternateEmail = req.body.alternateEmail;
-  if (!accessToken) {
-    res(404).send("Access token not found");
-    return;
-  }
-  if (id == null || alternateEmail == null) {
-    res.status(400).send("Bad request");
-    return;
-  }
-  try {
-    const query = `mutation {updatePerson(id: "${id}", alternate_email: "${alternateEmail}"){id full_name alternate_email aiesec_email contact_detail{phone country_code}}}`;
-    const response = fetchGraphQL(query);
-    if (response.ok) {
-      const data = response.json();
-      res.setHeader("Access-Control-Allow-Origin", "*");
-      res.send(data);
-    } else {
-      res.status(response.status).send(response.statusText);
-    }
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Internal Server Error");
-  }
-};
 
-export const updateUserPhone = async (req, res) => {
-  const accessToken = req.body.accessToken;
-  const id = req.params.id;
-  const phone = req.body.phone;
-  if (!accessToken) {
-    res(404).send("Access token not found");
-    return;
-  }
-  if (id == null || phone == null) {
-    res.status(400).send("Bad request");
-    return;
-  }
-  try {
-    const query = `mutation {updatePerson(id: "${id}", contact_detail_attributes: {phone: "${phone}"}){id full_name alternate_email aiesec_email contact_detail{phone country_code}}}`;
-    const response = fetchGraphQL(query);
-    if (response.ok) {
-      const data = response.json();
-      res.setHeader("Access-Control-Allow-Origin", "*");
-      res.send(data);
-    } else {
-      res.status(response.status).send(response.statusText);
+function stringifyValues(obj) {
+  const entries = Object.entries(obj).map(([key, value]) => {
+    if (typeof value === "object" && !Array.isArray(value)) {
+      return `${key}: ${stringifyValues(value)}`;
     }
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Internal Server Error");
-  }
-};
-export const updateUserCountryCode = async (req, res) => {
+    return `${key}: ${value}`;
+  });
+  return `{${entries.join(", ")}}`;
+}
+
+export const updateUser = async (req, res) => {
+  const userData = req.body.userData;
   const accessToken = req.body.accessToken;
   const id = req.params.id;
-  const countryCode = req.body.countryCode;
-  if (!accessToken) {
-    res(404).send("Access token not found");
-    return;
-  }
-  if (id == null || countryCode == null) {
+  if (!userData || !id || !accessToken) {
     res.status(400).send("Bad request");
     return;
   }
   try {
-    const query = `mutation {updatePerson(id: "${id}", contact_detail_attributes: {country_code: "${countryCode}"}){id full_name alternate_email aiesec_email contact_detail{phone country_code}}}`;
-    const response = fetchGraphQL(query);
+    const person = {
+      alternate_email: JSON.stringify(userData["alternate_email"]),
+      contact_detail_attributes: {
+        phone: JSON.stringify(userData["phone"]),
+        country_code: JSON.stringify(userData["country_code"]),
+      },
+    };
+    const query = `mutation {updatePerson(id: "${id}", person : ${stringifyValues(
+      person
+    )}){id full_name alternate_email aiesec_email profile_photo contact_detail{phone country_code}}}`;
+    const response = await fetchGraphQL(query, accessToken);
     if (response.ok) {
-      const data = response.json();
+      const data = await response.json();
+      if (data.errors) {
+        console.error(JSON.stringify(data.errors.message));
+        res.status(400).send(data.errors[0].message);
+        return;
+      }
       res.setHeader("Access-Control-Allow-Origin", "*");
       res.send(data);
     } else {
